@@ -54,8 +54,8 @@ test('2. Авторизованный пользователь может доб
     //Проверяем, что созданная статья сохранилась
     await app.main.goToProfile();
     await app.profile.openArticle(article.title);
-    await expect(page.getByRole('heading')).toContainText(article.title);
-    await expect(page.getByRole('paragraph')).toContainText(article.text);
+    await expect(app.article.heading).toContainText(article.title);
+    await expect(app.article.paragraph).toContainText(article.text);
 });
 
 test('3. Пользователь может редактировать свою статью', async({page}) => {
@@ -86,7 +86,6 @@ test('3. Пользователь может редактировать свою
     await app.main.register();
     await app.register.signUp(randomUser);
     await expect.soft(app.yourFeed.profileNameField).toContainText(randomUser.username);
-
     await app.main.newArticle();
     await app.newArticle.createArticle(article);
 
@@ -99,8 +98,8 @@ test('3. Пользователь может редактировать свою
     //Проверяем что изменения сохранились
     await app.main.goToProfile();
     await app.profile.openArticle(editedArticle.title);
-    await expect(page.getByRole('heading')).toContainText(editedArticle.title);
-    await expect(page.getByRole('paragraph')).toContainText(editedArticle.text);
+    await expect(app.article.heading).toContainText(editedArticle.title);
+    await expect(app.article.paragraph).toContainText(editedArticle.text);
 });
 
 test('4. Пользователь может удалить свою статью', async({page}) => {
@@ -124,18 +123,17 @@ test('4. Пользователь может удалить свою стать�
     await app.main.register();
     await app.register.signUp(randomUser);
     await expect.soft(app.yourFeed.profileNameField).toContainText(randomUser.username);
-
     await app.main.newArticle();
     await app.newArticle.createArticle(article);
 
+    //Удаляем статью
     await app.main.goToProfile();
     await app.profile.openArticle(article.title);
     await app.article.deleteArticle();
-    await page.waitForTimeout(2000);
 
     //Проверяем что статьи больше нет
+    await app.main.open();
     await app.main.goToProfile();
-    await page.waitForTimeout(2000);
     await expect(app.profile.articles).toContainText(`${randomUser.username} doesn't have articles.`);
 });
 
@@ -166,6 +164,7 @@ test('5. Пользователь может изменить свои личн�
     await app.main.goToSettings();
     await app.settings.editProfile(randomProfile);
     await app.main.logout();
+
     //Логинимся с новыми данными, проверям, что данные подтянулись
     await app.main.login();
     await app.login.signIn(randomProfile);
@@ -195,12 +194,12 @@ test('6. Пользователь может добавить свою стат�
     await expect.soft(app.yourFeed.profileNameField).toContainText(randomUser.username);
     await app.main.newArticle();
     await app.newArticle.createArticle(article);
-    //Без таймаутов падает, пришлось
-    await page.waitForTimeout(3000);
+    await app.main.open();
     await app.main.goToProfile();
+
     //Лайкаем созданную статью
     await app.profile.addArticleToFavorite(article.title);
-    await page.waitForTimeout(3000);
+    
     //Идем в Favorited Articles и проверяем, что статья там отображается
     await app.profile.goToFavoritedArticles();
     await expect(app.profile.firstArticle).toContainText(article.title);

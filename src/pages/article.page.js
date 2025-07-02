@@ -7,6 +7,8 @@ export class ArticlePage {
         this.articleTitle = page.locator("[name = 'title']");
         this.articleText = page.locator("[name = 'body']");
         this.articleTags = page.locator("[name = 'tags']");
+        this.heading = page.getByRole('heading');
+        this.paragraph = page.getByRole('paragraph');
     }
 
     async editArticle() {
