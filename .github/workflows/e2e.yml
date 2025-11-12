@@ -15,8 +15,8 @@ jobs:
         with:
           node-version: lts/*
       - name: Install packages
-        run: npm i
+        run: npm ci
       - name: Install browsers
-        run: npx playwright install --with-deps
+        run: npm exec playwright install --with-deps
       - name: Run tests
         run: npx playwright tests
